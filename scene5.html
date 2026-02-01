@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Our Moments</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;700&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- CORE RESET --- */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            background-color: #0f0505;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            color: white;
+            overflow-x: hidden; 
+        }
+
+        /* --- THE VIRTUAL SCROLL WRAPPER --- */
+        .smooth-scroll-wrapper {
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: auto;
+            will-change: transform;
+            z-index: 1;
+            overflow: hidden;
+            transform: translate3d(0,0,0);
+            backface-visibility: hidden;
+        }
+
+        /* Mobile / iOS Fallback */
+        body.is-mobile .smooth-scroll-wrapper {
+            position: relative;
+            transform: none !important;
+        }
+        body.is-mobile {
+            overflow-y: auto;
+        }
+
+        /* --- HEADER (FIXED) --- */
+        /* --- HEADER (FIXED CENTER) --- */
+        /* --- HEADER (FIXED CENTER MOBILE & DESKTOP) --- */
+        .header {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            /* Ensure padding doesn't affect width calculation */
+            box-sizing: border-box; 
+            padding: 25px 20px; /* Reduced side padding for safety */
+            padding-top: max(25px, env(safe-area-inset-top));
+            
+            /* Centering Magic */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+            z-index: 500;
+            pointer-events: none;
+        }
+        
+        .header-title {
+            font-family: 'Great Vibes', cursive;
+            font-size: 42px;
+            color: #FFFFFF; /* Solid White */
+            font-weight: 700; /* Bold */
+            text-shadow: 0 4px 15px rgba(0,0,0,0.8); /* Strong shadow for contrast */
+            margin: 0;
+            opacity: 0; 
+            animation: fadeInDown 1.5s ease forwards 0.5s;
+        }
+
+        /* --- CONTENT SECTION --- */
+        .content-section {
+            position: relative;
+            height: 100vh; 
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* --- PARALLAX BACKGROUNDS --- */
+        .parallax-bg {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 120%; 
+            z-index: 0; 
+            will-change: transform;
+            pointer-events: none;
+            transform: translateY(-10%); 
+        }
+
+        .bg-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            filter: brightness(0.70); 
+        }
+
+        /* --- GLASS CARDS (TEXT) --- */
+        .glass-card {
+            position: relative;
+            z-index: 100; 
+            width: 85%;
+            max-width: 450px;
+            padding: 40px 30px;
+            
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.6); 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            border-radius: 24px;
+            
+            text-align: center;
+            opacity: 0;
+            transform: translateY(60px);
+            transition: all 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .glass-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            color: #FFF;
+            margin-bottom: 15px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+        }
+
+        .card-text {
+            font-size: 18px;
+            color: #FFE4E6;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* --- BUTTONS --- */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 30px;
+            width: 100%;
+            pointer-events: auto;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 50px;
+            border: none;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Playfair Display', serif;
+            transition: transform 0.2s;
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #BE185D 0%, #9D174D 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(190, 24, 93, 0.5);
+        }
+        
+        .btn-convince {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.4);
+            color: white;
+        }
+
+        /* --- SCROLL HINT --- */
+        .scroll-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            color: #FFFFFF;
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            animation: float 2s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes float { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -10px); } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .main-question {
+            font-family: 'Great Vibes', cursive; /* Header font */
+            font-size: 42px; /* Large and readable */
+            color: #FFF;
+            margin: 20px 0;
+            line-height: 1.1;
+            text-shadow: 0 4px 15px rgba(255, 20, 147, 0.6); /* Romantic glow */
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1 class="header-title">Our Precious Moments</h1>
+    </header>
+
+    <div class="scroll-indicator" id="scrollHint">Scroll Gently</div>
+
+    <div class="smooth-scroll-wrapper" id="scrollWrapper">
+        
+        <div class="content-section">
+            <div class="parallax-bg">
+                <img class="bg-img" 
+                     data-mobile="https://images.unsplash.com/photo-1663361963652-e7c0a08c06d3?w=800&h=1422&fit=crop&crop=faces&q=80" 
+                     data-desktop="https://images.unsplash.com/photo-1529175283207-194a414b9ffa?w=1600&h=900&fit=crop&q=80" 
+                     src="" alt="First Date">
+            </div>
+            
+            <div class="glass-card">
+                <h2 class="card-title">Where it Began</h2>
+                <p class="card-text">That first coffee, the awkward silence, and the moment I knew my life had changed forever.</p>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="parallax-bg">
+                <img class="bg-img" 
+                     data-mobile="https://images.unsplash.com/photo-1715309218884-78f63d37367e?w=800&h=1422&fit=crop&crop=faces&q=80"
+                     data-desktop="https://images.unsplash.com/photo-1757374730087-d179bf8e5d29?w=1600&h=900&fit=crop&q=80"
+                     src="" alt="Adventure">
+            </div>
+            
+            <div class="glass-card">
+                <h2 class="card-title">Growing Closer</h2>
+                <p class="card-text">Through every laugh, every trip, and every late night call, you became my home.</p>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="parallax-bg">
+                <img class="bg-img" 
+                     data-mobile="https://images.unsplash.com/photo-1591969851586-adbbd4accf81?w=800&h=1422&fit=crop&crop=faces&q=80"
+                     data-desktop="https://images.unsplash.com/photo-1615966650071-855b15f29ad1?w=1600&h=900&fit=crop&q=80"
+                     src="" alt="Just Us">
+            </div>
+            
+            <div class="glass-card">
+                <h2 class="card-title">Just Us</h2>
+                <p class="card-text">In a world of chaos, you are my peace. You are my favorite place to be.</p>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="parallax-bg">
+                <img class="bg-img" 
+                     data-mobile="https://images.unsplash.com/photo-1598976701972-40f0bf429d9f?w=800&h=1422&fit=crop&crop=faces&q=80"
+                     data-desktop="https://images.unsplash.com/photo-1627466147552-b2b9e476a75c?w=1600&h=900&fit=crop&q=80"
+                     src="" alt="Proposal">
+            </div>
+            
+            <div class="glass-card">
+                <h2 class="card-title">One Last Question</h2>
+                <p class="card-text">I don't want to spend another day without asking you this...</p>
+                
+                <div class="main-question">Will You Be My Valentine Forever?</div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-yes" onclick="goYes()">
+                        Yes, Absolutely! ❤️
+                    </button>
+                    <button class="btn btn-convince" onclick="goConvince()">
+                        Convince me more ;)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. IMAGE LOADER ---
+        function loadImages() {
+            const isPortrait = window.innerHeight > window.innerWidth;
+            const images = document.querySelectorAll('.bg-img');
+            images.forEach(img => {
+                const src = isPortrait ? img.dataset.mobile : img.dataset.desktop;
+                if (img.src !== src) img.src = src;
+            });
+        }
+        loadImages();
+        window.addEventListener('resize', loadImages);
+
+
+        // --- 2. ENGINE SETUP ---
+        // Detect Mobile or iOS
+        const isMobile = window.innerWidth <= 768;
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const useNativeScroll = isMobile || isIOS;
+
+        const wrapper = document.getElementById('scrollWrapper');
+        const scrollHint = document.getElementById('scrollHint');
+        const sections = document.querySelectorAll('.content-section');
+        const bgLayers = document.querySelectorAll('.parallax-bg');
+
+
+        // --- 3. FORCE VISIBILITY OF FIRST CARD IMMEDIATELY ---
+        // This fixes the issue where the first box waits for a scroll to appear
+        setTimeout(() => {
+            sections[0].querySelector('.glass-card').classList.add('visible');
+        }, 100);
+
+
+        if (useNativeScroll) {
+            // --- MOBILE / iOS (Native) ---
+            document.body.classList.add('is-mobile');
+            
+            // Intersection Observer specifically for revealing cards on scroll
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.querySelector('.glass-card').classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.2 });
+
+            sections.forEach(sec => observer.observe(sec));
+
+            window.addEventListener('scroll', () => {
+                const scrolled = window.scrollY;
+                if(scrolled > 50) scrollHint.style.opacity = 0;
+
+                // Simple Parallax for Mobile
+                sections.forEach((section, i) => {
+                    const bg = bgLayers[i];
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.offsetHeight;
+                    
+                    if (scrolled + window.innerHeight > sectionTop && scrolled < sectionTop + sectionHeight) {
+                        // Calc distance from center
+                        const center = scrolled + (window.innerHeight / 2);
+                        const secCenter = sectionTop + (sectionHeight / 2);
+                        const dist = center - secCenter;
+                        
+                        // Move background slightly
+                        bg.style.transform = `translateY(${dist * 0.2}px)`;
+                    }
+                });
+            });
+
+        } else {
+            // --- DESKTOP (Raaya Momentum) ---
+            
+            let current = 0;
+            let target = 0;
+            let ease = 0.075; 
+
+            // Scroll Height Logic
+            function updateBodyHeight() {
+                const contentHeight = wrapper.getBoundingClientRect().height;
+                if(contentHeight > 0) {
+                    document.body.style.height = `${contentHeight}px`;
+                }
+            }
+            
+            const resizeObserver = new ResizeObserver(updateBodyHeight);
+            resizeObserver.observe(wrapper);
+            window.addEventListener('load', updateBodyHeight);
+            
+            function smoothScroll() {
+                current += (target - current) * ease;
+                
+                // Move Wrapper
+                wrapper.style.transform = `translate3d(0, ${-current}px, 0)`;
+                
+                if (current > 50) scrollHint.style.opacity = 0;
+
+                sections.forEach((section, i) => {
+                    const bg = bgLayers[i];
+                    const card = section.querySelector('.glass-card');
+                    
+                    const sectionTop = i * window.innerHeight;
+                    
+                    // Logic: Is section visible?
+                    if (current + window.innerHeight > sectionTop && current < sectionTop + window.innerHeight) {
+                        
+                        // Text Reveal (If logic misses, the IntersectionObserver backup below catches it)
+                        if (current + (window.innerHeight * 0.7) > sectionTop) {
+                            card.classList.add('visible');
+                        }
+
+                        // Parallax
+                        const center = current + (window.innerHeight / 2);
+                        const secCenter = sectionTop + (window.innerHeight / 2);
+                        const dist = center - secCenter;
+                        
+                        bg.style.transform = `translate3d(0, ${dist * 0.3}px, 0)`;
+                    }
+                });
+
+                requestAnimationFrame(smoothScroll);
+            }
+
+            window.addEventListener('scroll', () => {
+                target = window.scrollY;
+            });
+
+            smoothScroll();
+        }
+
+        // Navigation
+        function goYes() { window.location.href = "scene6.html"; }
+        function goConvince() { window.location.href = "scene7.html"; }
+    </script>
+</body>
+</html>

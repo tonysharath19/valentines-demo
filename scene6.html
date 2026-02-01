@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Forever</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- CORE --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            margin: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            /* Magical Starry Night Gradient */
+            background: linear-gradient(to bottom, #020111 0%, #191654 40%, #433E85 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Playfair Display', serif;
+            position: relative;
+        }
+
+        /* --- STARRY BACKGROUND (CSS ANIMATION) --- */
+        .stars {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            opacity: 0.6;
+            animation: twinkle 4s infinite linear;
+        }
+
+        @keyframes twinkle {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-200px); }
+        }
+
+        /* --- TEXT ANIMATIONS --- */
+        .text-container {
+            position: relative;
+            z-index: 20; /* Above fireworks */
+            text-align: center;
+            margin-bottom: 40px;
+            pointer-events: none; 
+        }
+
+        .main-text {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.5rem;
+            color: #FFDEE9;
+            text-shadow: 0 0 20px rgba(255, 105, 180, 0.8), 0 0 40px rgba(255, 20, 147, 0.4);
+            opacity: 0;
+            transform: scale(0.5);
+            animation: popIn 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 0.5s;
+        }
+
+        .sub-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: #B5EAD7; /* Soft Mint for contrast */
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-top: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 1s ease forwards 1.5s;
+        }
+
+        /* --- SURPRISE BUTTON --- */
+        .btn-container {
+            position: relative;
+            z-index: 30; /* Highest priority for clicking */
+            margin-top: 20px;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards 2.5s; /* Appears last */
+        }
+
+        .btn-surprise {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-family: 'Playfair Display', serif;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 182, 193, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: glowPulse 2s infinite ease-in-out;
+        }
+
+        .btn-surprise:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 182, 193, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(255, 105, 180, 0.8); }
+        }
+
+        /* --- PARTICLE CANVAS --- */
+        #particleCanvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10; /* Between stars and text */
+            pointer-events: none; /* Let clicks pass */
+        }
+
+        /* --- KEYFRAMES --- */
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes slideUp {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 600px) {
+            .main-text { font-size: 2.8rem; padding: 0 20px; }
+            .sub-text { font-size: 1rem; letter-spacing: 2px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="stars"></div>
+
+    <div class="text-container">
+        <h1 class="main-text">Delivery Accepted 💖</h1>
+        <div class="sub-text">Forever Mode Activated <br>No Return Policy!</div>
+    </div>
+
+    <div class="btn-container">
+        <button class="btn-surprise" onclick="goToSurprise()">
+            <span>I have a surprise 🎁</span>
+        </button>
+    </div>
+
+    <canvas id="particleCanvas"></canvas>
+
+    <script>
+        window.onload = function() {
+            // 1. Check if the user just came from Scene 7
+            const cameFromConvince = sessionStorage.getItem('fromConvincePage');
+            const surpriseBtn = document.querySelector('.btn-container');
+
+            if (cameFromConvince === 'true') {
+                // PATH B: They just saw the surprise, so HIDE the button
+                if(surpriseBtn) surpriseBtn.style.display = 'none';
+                
+                // Optional: Clear the flag so if they reload fresh later, it resets
+                sessionStorage.removeItem('fromConvincePage'); 
+            } else {
+                // PATH A: They hit "Yes" directly. Button remains VISIBLE.
+            }
+            
+            // 2. Start your fireworks (Keep your existing code)
+            resize();
+            loop();
+        };
+
+        function goToSurprise() {
+            // Mark that we are leaving the Celebration page to see the surprise
+            sessionStorage.setItem('comingFromCelebration', 'true');
+            
+            // Go to Scene 7
+            window.location.href = "scene7.html";
+        }
+
+        // ... rest of your fireworks code ...
+        // ... (Keep the rest of your Fireworks code below this) ...
+
+        // --- FIREWORKS ENGINE ---
+        const COLORS = ['#FF1493', '#FF69B4', '#FFB6C1', '#FFD700', '#FFFFFF', '#00FFFF'];
+        const SHAPES = ['heart', 'star', 'circle'];
+
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type; 
+                
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = type === 'explosion' ? Math.random() * 5 + 2 : Math.random() * 1 + 0.5;
+                
+                this.vx = Math.cos(angle) * velocity;
+                this.vy = type === 'explosion' ? Math.sin(angle) * velocity : -velocity;
+                
+                this.gravity = type === 'explosion' ? 0.05 : 0;
+                this.friction = type === 'explosion' ? 0.96 : 1;
+                
+                this.alpha = 1;
+                this.decay = type === 'explosion' ? Math.random() * 0.015 + 0.005 : 0.002;
+                
+                this.size = Math.random() * 12 + 4;
+                this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+                this.shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotateSpeed = (Math.random() - 0.5) * 0.1;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+
+                if (this.shape === 'heart') this.drawHeart();
+                else if (this.shape === 'star') this.drawStar();
+                else this.drawCircle();
+
+                ctx.restore();
+            }
+
+            drawHeart() {
+                const s = this.size / 2;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                // Simplified Heart Path
+                ctx.bezierCurveTo(-s, -s/2, -s*2, -s/2, 0, s);
+                ctx.bezierCurveTo(s*2, -s/2, s, -s/2, 0, 0); 
+                // Fill
+                ctx.fill();
+                // To make it look better (Full shape):
+                ctx.beginPath();
+                let topY = -this.size * 0.3;
+                ctx.arc(-this.size/4, topY, this.size/4, Math.PI, 0);
+                ctx.arc(this.size/4, topY, this.size/4, Math.PI, 0);
+                ctx.moveTo(0, this.size/2);
+                ctx.lineTo(-this.size/2, topY);
+                ctx.lineTo(this.size/2, topY);
+                ctx.fill();
+            }
+
+            drawStar() {
+                const spikes = 5;
+                const outerRadius = this.size / 2;
+                const innerRadius = this.size / 4;
+                let rot = Math.PI / 2 * 3;
+                let x = 0; let y = 0;
+                let step = Math.PI / spikes;
+
+                ctx.beginPath();
+                ctx.moveTo(0, -outerRadius);
+                for (let i = 0; i < spikes; i++) {
+                    x = Math.cos(rot) * outerRadius; y = Math.sin(rot) * outerRadius;
+                    ctx.lineTo(x, y); rot += step;
+                    x = Math.cos(rot) * innerRadius; y = Math.sin(rot) * innerRadius;
+                    ctx.lineTo(x, y); rot += step;
+                }
+                ctx.lineTo(0, -outerRadius);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            drawCircle() {
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size / 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += this.gravity;
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+                this.alpha -= this.decay;
+                this.rotation += this.rotateSpeed;
+            }
+        }
+
+        function loop() {
+            ctx.clearRect(0, 0, width, height);
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw();
+                if (p.alpha <= 0) particles.splice(i, 1);
+            }
+
+            if (Math.random() < 0.08) particles.push(new Particle(Math.random() * width, height + 20, 'float'));
+            if (Math.random() < 0.02) createFirework(Math.random() * width, Math.random() * (height * 0.6));
+            
+            requestAnimationFrame(loop);
+        }
+
+        function createFirework(x, y) {
+            for (let i = 0; i < 30; i++) particles.push(new Particle(x, y, 'explosion'));
+        }
+
+        // Init Blast
+        setTimeout(() => createFirework(width / 2, height / 2), 500);
+        setTimeout(() => {
+            createFirework(width * 0.2, height * 0.3);
+            createFirework(width * 0.8, height * 0.3);
+        }, 1200);
+
+        loop();
+        
+        // Interactive
+        window.addEventListener('click', (e) => {
+            // Only firework if not clicking the button
+            if(e.target.tagName !== 'BUTTON') {
+                createFirework(e.clientX, e.clientY);
+            }
+        });
+    </script>
+</body>
+</html>

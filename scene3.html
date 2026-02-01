@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Live Tracking</title>
+    <style>
+        /* --- RESET & CORE --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #F4F6F8;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- HEADER --- */
+        .header {
+            background: #2563EB;
+            padding: 20px;
+            padding-top: max(20px, env(safe-area-inset-top));
+            display: flex;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+            flex-shrink: 0;
+        }
+        .header-title { color: white; font-weight: 600; font-size: 16px; }
+
+        /* --- MAP WRAPPER --- */
+        .map-wrapper {
+            flex: 1;
+            position: relative;
+            background-color: #F0F3F5;
+            overflow: hidden;
+            width: 100%;
+            /* Center the drawing area */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- BACKGROUND ART --- */
+        .map-background {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .lake {
+            position: absolute;
+            width: 30%; height: 20%;
+            background-color: #D6EFFF;
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            top: 10%; right: -5%;
+        }
+        
+        .park {
+            position: absolute;
+            width: 35%; height: 25%;
+            background-color: #DCFCE7;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            bottom: 10%; left: -5%;
+        }
+
+        .road { position: absolute; background-color: white; border: 1px solid #E5E7EB; }
+        .road.main { width: 150%; height: 24px; top: 50%; left: -25%; transform: rotate(-20deg); border: none; border-top: 3px solid #E5E7EB; border-bottom: 3px solid #E5E7EB; }
+        .road.v1 { height: 100%; width: 15px; left: 20%; top: 0; }
+        .road.v2 { height: 100%; width: 12px; left: 80%; top: 0; }
+        .road.h1 { width: 100%; height: 12px; top: 25%; }
+        .road.h2 { width: 100%; height: 10px; top: 80%; }
+
+        /* --- THE HEART TRAIL --- */
+        .trail-svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .trail-path {
+            fill: none;
+            stroke: #C2185B; /* Pink */
+            stroke-width: 5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 3000;
+            stroke-dashoffset: 3000;
+            opacity: 0.9;
+            filter: drop-shadow(0px 0px 4px rgba(194, 24, 91, 0.4));
+        }
+
+        /* --- THE DOT --- */
+        .tracking-dot {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background-color: #C2185B;
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 20;
+            transform: translate(-50%, -50%);
+        }
+        
+        .tracking-dot::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 60px; height: 60px;
+            background: rgba(194, 24, 91, 0.25);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: radar 2s infinite;
+        }
+
+        @keyframes radar {
+            0% { width: 22px; height: 22px; opacity: 0.8; }
+            100% { width: 80px; height: 80px; opacity: 0; }
+        }
+
+        /* --- STATUS BADGE --- */
+        .status-badge {
+            position: absolute;
+            top: 20px; left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .status-dot-icon {
+            width: 8px; height: 8px;
+            background-color: #10B981;
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        /* --- FOOTER --- */
+        .footer {
+            background: white;
+            padding: 20px;
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .btn-main {
+            width: 100%;
+            background-color: #374151;
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: default;
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-main.ready {
+            background-color: #C2185B;
+            transform: scale(1.02);
+            cursor: pointer;
+            box-shadow: 0 8px 25px -5px rgba(194, 24, 91, 0.5);
+        }
+
+    </style>
+</head>
+<body onload="initPerfectHeart()">
+
+    <header class="header">
+        <div class="header-title">Live Tracking</div>
+    </header>
+
+    <div class="map-wrapper" id="mapWrapper">
+        <div class="map-background">
+            <div class="lake"></div>
+            <div class="park"></div>
+            <div class="road v1"></div>
+            <div class="road v2"></div>
+            <div class="road h1"></div>
+            <div class="road h2"></div>
+            <div class="road main"></div>
+        </div>
+
+        <div class="status-badge">
+            <div class="status-dot-icon"></div>
+            <span id="statusText">Locating courier...</span>
+        </div>
+
+        <svg class="trail-svg">
+            <path id="trailPath" class="trail-path" d="" />
+        </svg>
+
+        <div class="tracking-dot" id="dot"></div>
+    </div>
+
+    <footer class="footer">
+        <button class="btn-main" id="actionBtn" onclick="openOrder()">
+            <span>🕒 Arriving soon...</span>
+        </button>
+    </footer>
+
+    <script>
+        let isDelivered = false;
+
+        function initPerfectHeart() {
+            // Recalculate if window resizes to prevent distortion
+            drawHeart();
+            window.addEventListener('resize', drawHeart);
+        }
+
+        function drawHeart() {
+            const wrapper = document.getElementById('mapWrapper');
+            const pathElement = document.getElementById('trailPath');
+            const dot = document.getElementById('dot');
+            const statusText = document.getElementById('statusText');
+            const btn = document.getElementById('actionBtn');
+
+            // 1. Get Available Space
+            const w = wrapper.clientWidth;
+            const h = wrapper.clientHeight;
+
+            // 2. Uniform Scaling with Safe Padding
+            const size = Math.min(w, h) * 0.85; 
+            const r = size / 2; // Radius/Reference unit
+            
+            // 3. Center the Heart
+            const cx = w / 2;
+            const cy = h / 2;
+            
+            // 4. HEART GEOMETRY CONFIG (Adjusted for Deep Curve)
+            
+            // Bottom Tip: 
+            const bottomX = cx;
+            const bottomY = cy + (r * 0.9); 
+
+            // Top Dip (The Inner Curve):
+            // CHANGED: Moved from 0.4 to 0.15. This pushes the dip much lower.
+            const topDipX = cx;
+            const topDipY = cy - (r * 0.15); 
+
+            // Control Points (The Shoulders):
+            // We widen these slightly to compensate for the deep dip
+            const leftAnchorX = cx - (r * 1.25);
+            const leftAnchorY = cy - (r * 0.9); 
+
+            const rightAnchorX = cx + (r * 1.25);
+            const rightAnchorY = cy - (r * 0.9);
+
+            // Control Points (Bottom Bellies):
+            // We pull these out to ensure it doesn't look like a V
+            const leftBellyX = bottomX - (r * 1.1);
+            const leftBellyY = bottomY - (r * 0.45);
+
+            const rightBellyX = bottomX + (r * 1.1);
+            const rightBellyY = bottomY - (r * 0.45);
+
+
+            // 5. Construct Path (Bottom -> Left Lobe -> Dip -> Right Lobe -> Bottom)
+            const d = `
+                M ${bottomX},${bottomY}
+                C ${leftBellyX},${leftBellyY} ${leftAnchorX},${leftAnchorY} ${topDipX},${topDipY}
+                C ${rightAnchorX},${rightAnchorY} ${rightBellyX},${rightBellyY} ${bottomX},${bottomY}
+            `;
+
+            pathElement.setAttribute('d', d);
+
+            // 6. Start Animation (Only on first load)
+            if (!window.animationStarted) {
+                window.animationStarted = true;
+                runAnimation(pathElement, dot, statusText, btn);
+            }
+        }
+
+        function runAnimation(pathElement, dot, statusText, btn) {
+            const len = pathElement.getTotalLength();
+            pathElement.style.strokeDasharray = len;
+            pathElement.style.strokeDashoffset = len;
+
+            // Initial Position
+            const p0 = pathElement.getPointAtLength(0);
+            dot.style.left = p0.x + 'px';
+            dot.style.top = p0.y + 'px';
+
+            let progress = 0;
+            const duration = 6000;
+            const interval = 16;
+            const step = interval / duration;
+
+            const timer = setInterval(() => {
+                progress += step;
+                
+                // Keep drawing correctly even if resized during animation
+                const currentLen = pathElement.getTotalLength();
+                pathElement.style.strokeDasharray = currentLen;
+
+                if (progress >= 1) {
+                    progress = 1;
+                    clearInterval(timer);
+                    finalizeDelivery(btn, statusText);
+                }
+
+                // Draw
+                pathElement.style.strokeDashoffset = currentLen * (1 - progress);
+
+                // Move
+                const p = pathElement.getPointAtLength(currentLen * progress);
+                dot.style.left = p.x + 'px';
+                dot.style.top = p.y + 'px';
+
+                // Text
+                if (progress < 0.3) statusText.innerText = "Courier nearby...";
+                else if (progress < 0.6) statusText.innerText = "Taking the scenic route..."; 
+                else if (progress < 0.9) statusText.innerText = "Almost there...";    
+
+            }, interval);
+        }
+
+        function finalizeDelivery(btn, statusText) {
+            isDelivered = true;
+            statusText.innerText = "Package Delivered ❤️";
+            statusText.style.color = "#C2185B";
+            
+            btn.classList.add('ready');
+            btn.innerHTML = `<span>📦 Order Delivered - Open Now</span>`;
+        }
+
+        function openOrder() {
+            if (!isDelivered) return;
+            window.location.href = "scene4.html";
+        }
+    </script>
+</body>
+</html>

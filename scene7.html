@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Evidence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Parisienne&family=Kaushan+Script&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- RESET & CORE --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        html, body {
+            margin: 0;
+            width: 100%;
+            font-family: 'Lato', sans-serif;
+            background-color: #FFF;
+            color: #4A0404;
+            scroll-behavior: smooth;
+        }
+
+        /* --- STICKY NOTIFICATION HEADER --- */
+        .notification-bar {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 15px 20px;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
+
+        .notification-text {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #DB2777;
+            text-align: center;
+            line-height: 1.4;
+            font-weight: 700;
+        }
+
+        /* --- SECTION BASE STYLES --- */
+        .full-section {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px; /* Space for header */
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-title {
+            font-family: 'Parisienne', cursive;
+            font-size: 3.5rem;
+            color: #831843;
+            margin-bottom: 30px;
+            text-align: center;
+            z-index: 10;
+            text-shadow: 0 2px 10px rgba(255,255,255,0.5);
+        }
+
+        /* --- SECTION 1: AUDIO (Pastel Pink + Grain) --- */
+        .section-audio {
+            /* Luxe Gradient: Soft Pink to Peach */
+            background: radial-gradient(circle at top left, #FFF0F5, #FFE4E6);
+            position: relative;
+        }
+        /* SVG Background Pattern (Subtle Wave) */
+        .bg-wave {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0.4;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 12.878 58.428 10 50 10c-8.428 0-15.888 2.878-25.371 7.072-3.094 1.237-5.723 2.198-8.233 2.928h4.788zM7.97 4c-2.51-.73-5.139-1.691-8.233-2.928C-9.712.878-17.172-2-25.6-2c-8.428 0-15.888 2.878-25.371 7.072-3.094 1.237-5.723 2.198-8.233 2.928h4.788c.357-.13.72-.264 1.088-.402l1.768-.661C-30.64-.653-24.647-2-14.296-2c10.271 0 15.362 1.222 24.629 4.928C11.288 3.311 12.202 3.668 13.083 4H7.97zM50 20c-8.428 0-15.888 2.878-25.371 7.072-3.094 1.237-5.723 2.198-8.233 2.928h4.788c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 25.347 39.647 24 50 24c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 22.878 58.428 20 50 20z' fill='%23DB2777' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+
+        .audio-player-ui {
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 15px 35px rgba(219, 39, 119, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .visualizer-bars {
+            display: flex;
+            gap: 6px;
+            height: 40px;
+            align-items: center;
+        }
+        .v-bar {
+            width: 6px;
+            background: #DB2777;
+            border-radius: 10px;
+            animation: vibe 1s infinite ease-in-out;
+        }
+        .v-bar:nth-child(2n) { animation-duration: 0.8s; height: 60%; }
+        .v-bar:nth-child(3n) { animation-duration: 1.2s; height: 40%; }
+        @keyframes vibe { 0%,100%{height: 30%;} 50%{height: 100%;} }
+
+        audio { width: 100%; filter: sepia(20%) hue-rotate(300deg); margin-top: 10px; }
+
+
+        /* --- SECTION 2: LETTER (Pastel Lavender + Paper Texture) --- */
+        .section-letter {
+            /* Luxe Gradient: Soft Lavender to White */
+            background: linear-gradient(180deg, #F3F0FF 0%, #FFFFFF 100%);
+        }
+
+        .letter-container {
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            padding: 40px;
+        }
+        
+        /* The "Paper" Look */
+        .handwritten-content {
+            font-family: 'Kaushan Script', cursive;
+            font-size: 22px;
+            line-height: 2.2; /* Wide line height for luxury */
+            color: #4B5563;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Giant background quote mark */
+        .quote-bg {
+            position: absolute;
+            top: -20px; left: 10px;
+            font-size: 150px;
+            font-family: serif;
+            color: #E0E7FF;
+            opacity: 0.5;
+            z-index: 1;
+        }
+
+
+        /* --- SECTION 3: VIDEO (Pastel Mint/Cream) --- */
+        .section-video {
+            /* Luxe Gradient: Soft Mint to Cream */
+            background: radial-gradient(circle at bottom right, #ECFDF5, #FFFBEB);
+        }
+
+        .video-frame {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.15);
+            border: 8px solid rgba(255,255,255,0.8);
+            position: relative;
+        }
+        
+        video { width: 100%; display: block; }
+
+
+        /* --- FOOTER (CONVINCE BUTTON) --- */
+        .footer-section {
+            background: #FFF;
+            padding: 60px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-convinced {
+            background: linear-gradient(135deg, #BE185D 0%, #9D174D 100%);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            border-radius: 50px;
+            font-size: 20px;
+            font-family: 'Parisienne', cursive;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(190, 24, 93, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-convinced:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(190, 24, 93, 0.5);
+        }
+        
+        /* Shine effect */
+        .btn-convinced::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine { to { left: 100%; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="notification-bar">
+        <span class="notification-text">
+            ✨ Notice:"Please select one message format.<br>The 'A Note For You' option is complimentary.<br>Other formats are subject to an additional fee."
+        </span>
+    </div>
+
+    <section class="full-section section-audio">
+        <div class="bg-wave"></div>
+        
+        <h2 class="section-title">Voice Note #1</h2>
+        
+        <div class="audio-player-ui">
+            <div class="visualizer-bars">
+                <div class="v-bar"></div><div class="v-bar"></div><div class="v-bar"></div>
+                <div class="v-bar"></div><div class="v-bar"></div><div class="v-bar"></div>
+                <div class="v-bar"></div><div class="v-bar"></div><div class="v-bar"></div>
+            </div>
+            <audio controls>
+                <source src="your-audio.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            <p style="font-size: 14px; color: #9D174D; font-style: italic;">"Listen closely..."</p>
+        </div>
+    </section>
+
+    <section class="full-section section-letter">
+        <h2 class="section-title">A Note for You</h2>
+        
+        <div class="letter-container">
+            <div class="quote-bg">“</div>
+            <p class="handwritten-content">
+                My Dearest,<br><br>
+                Words often fail me when I look at you, but I'll try anyway. 
+                Every moment with you feels like my favorite song playing on repeat.
+                I wrote this because sometimes "I love you" just isn't enough...<br><br>
+                Always Yours,<br>
+                [Your Name]
+            </p>
+        </div>
+    </section>
+
+    <section class="full-section section-video">
+        <h2 class="section-title">Video Message</h2>
+        
+        <div class="video-frame">
+            <video id="videoPlayer" controls muted poster="https://placehold.co/800x450/pink/white?text=Our+Story" onclick="this.play()">
+                <source src="vid.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </section>
+
+    <div class="footer-section">
+        <button class="btn-convinced" onclick="goBackToProposal()">
+            Okay, I'm Convinced! ❤️
+        </button>
+    </div>
+
+    <script>
+        // Check where the user came from on Load
+        window.onload = function() {
+            const isFromCelebration = sessionStorage.getItem('comingFromCelebration');
+            const btn = document.querySelector('.btn-convinced');
+
+            if (isFromCelebration === 'true') {
+                // CASE: They already said YES and are just looking at the surprise
+                // Change button text and behavior
+                btn.innerText = "Back to Celebration ✨";
+
+                // Clear the flag so it doesn't get stuck
+                sessionStorage.removeItem('comingFromCelebration');
+            } else {
+                // CASE: They came from the Proposal (Scene 5) and need convincing
+                btn.innerText = "Okay, I'm Convinced! ❤️";
+            }
+
+            // Video loop setup
+            const video = document.getElementById('videoPlayer');
+            video.addEventListener('timeupdate', function() {
+                if (video.currentTime >= 7) {
+                    video.currentTime = 0;
+                    video.play();
+                }
+            });
+        };
+
+        function goBackToProposal() {
+            // ALWAYS set this flag, so when they land on Scene 6, the "Surprise" button is hidden
+            // (Because they have now seen the surprise)
+            sessionStorage.setItem('fromConvincePage', 'true');
+
+            // Go to Celebration (Scene 6)
+            window.location.href = "scene6.html";
+        }
+    </script>
+
+</body>
+</html>
