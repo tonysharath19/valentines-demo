@@ -161,12 +161,6 @@
         }
 
         /* --- CTA BUTTON --- */
-        .footer {
-            padding: 24px;
-            padding-bottom: max(34px, env(safe-area-inset-bottom));
-            z-index: 10;
-        }
-
         .btn-continue {
             width: 100%;
             background: #BE185D; /* Romantic Red-Pink */
@@ -238,13 +232,13 @@
                     <span class="value" style="color: #9D174D;">Fragile. Please Don't Return.</span>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="footer">
-        <button class="btn-continue btn-reveal" onclick="goToCarousel()">
-            Continue ➔
-        </button>
+            <button class="btn-continue btn-reveal" onclick="goToCarousel()" style="margin-top: 10px;">
+                Continue ➔
+            </button>
+
+        </div>
+
     </div>
 
     <script>
