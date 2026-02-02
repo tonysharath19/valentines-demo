@@ -11,10 +11,12 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #F4F6F8;
-            height: 100vh;
+            /* FIX: Use Dynamic Height */
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            position: relative;
         }
 
         /* --- HEADER --- */
@@ -32,12 +34,11 @@
 
         /* --- MAP WRAPPER --- */
         .map-wrapper {
-            flex: 1;
+            flex: 1; /* Takes all remaining space */
             position: relative;
             background-color: #F0F3F5;
             overflow: hidden;
             width: 100%;
-            /* Center the drawing area */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -151,18 +152,23 @@
         }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-        /* --- FOOTER --- */
-        .footer {
-            background: white;
-            padding: 20px;
-            padding-bottom: max(20px, env(safe-area-inset-bottom));
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
-            z-index: 100;
-            flex-shrink: 0;
+        /* --- BUTTON CONTAINER (Replaces Footer) --- */
+        .action-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 24px;
+            padding-bottom: max(34px, env(safe-area-inset-bottom));
+            z-index: 200;
+            background: linear-gradient(to top, rgba(244,246,248,1) 60%, rgba(244,246,248,0));
+            display: flex;
+            justify-content: center;
         }
 
         .btn-main {
             width: 100%;
+            max-width: 400px; /* Limit width on tablets */
             background-color: #374151;
             color: white;
             border: none;
@@ -175,6 +181,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         .btn-main.ready {
@@ -194,6 +201,8 @@
             }
             .map-wrapper {
                 padding: 10px;
+                /* Add padding bottom so content isn't covered by button */
+                padding-bottom: 90px; 
             }
             .status-badge {
                 top: 15px;
@@ -205,9 +214,9 @@
                 width: 7px;
                 height: 7px;
             }
-            .footer {
+            .action-container {
                 padding: 16px;
-                padding-bottom: max(16px, env(safe-area-inset-bottom));
+                padding-bottom: max(20px, env(safe-area-inset-bottom));
             }
             .btn-main {
                 padding: 16px;
@@ -224,10 +233,6 @@
                 left: 10px;
                 padding: 6px 12px;
                 font-size: 12px;
-            }
-            .footer {
-                padding: 12px;
-                padding-bottom: max(12px, env(safe-area-inset-bottom));
             }
             .btn-main {
                 padding: 14px;
@@ -264,19 +269,19 @@
         </svg>
 
         <div class="tracking-dot" id="dot"></div>
-    </div>
+        
+        <div class="action-container">
+            <button class="btn-main" id="actionBtn" onclick="openOrder()">
+                <span>🕒 Arriving soon...</span>
+            </button>
+        </div>
 
-    <footer class="footer">
-        <button class="btn-main" id="actionBtn" onclick="openOrder()">
-            <span>🕒 Arriving soon...</span>
-        </button>
-    </footer>
+    </div>
 
     <script>
         let isDelivered = false;
 
         function initPerfectHeart() {
-            // Recalculate if window resizes to prevent distortion
             drawHeart();
             window.addEventListener('resize', drawHeart);
         }
@@ -288,47 +293,34 @@
             const statusText = document.getElementById('statusText');
             const btn = document.getElementById('actionBtn');
 
-            // 1. Get Available Space
+            // 1. Get Space (Account for button overlay)
             const w = wrapper.clientWidth;
-            const h = wrapper.clientHeight;
+            // Subtracting 80px buffer for button area
+            const h = wrapper.clientHeight - 80; 
 
-            // 2. Uniform Scaling with Safe Padding
+            // 2. Scale
             const size = Math.min(w, h) * 0.85; 
-            const r = size / 2; // Radius/Reference unit
+            const r = size / 2; 
             
-            // 3. Center the Heart
+            // 3. Center (Push up slightly to avoid button overlap)
             const cx = w / 2;
-            const cy = h / 2;
+            const cy = (h / 2) - 20; 
             
-            // 4. HEART GEOMETRY CONFIG (Adjusted for Deep Curve)
-            
-            // Bottom Tip: 
+            // 4. HEART GEOMETRY
             const bottomX = cx;
             const bottomY = cy + (r * 0.9); 
-
-            // Top Dip (The Inner Curve):
-            // CHANGED: Moved from 0.4 to 0.15. This pushes the dip much lower.
             const topDipX = cx;
             const topDipY = cy - (r * 0.15); 
-
-            // Control Points (The Shoulders):
-            // We widen these slightly to compensate for the deep dip
             const leftAnchorX = cx - (r * 1.25);
             const leftAnchorY = cy - (r * 0.9); 
-
             const rightAnchorX = cx + (r * 1.25);
             const rightAnchorY = cy - (r * 0.9);
-
-            // Control Points (Bottom Bellies):
-            // We pull these out to ensure it doesn't look like a V
             const leftBellyX = bottomX - (r * 1.1);
             const leftBellyY = bottomY - (r * 0.45);
-
             const rightBellyX = bottomX + (r * 1.1);
             const rightBellyY = bottomY - (r * 0.45);
 
-
-            // 5. Construct Path (Bottom -> Left Lobe -> Dip -> Right Lobe -> Bottom)
+            // 5. Construct Path
             const d = `
                 M ${bottomX},${bottomY}
                 C ${leftBellyX},${leftBellyY} ${leftAnchorX},${leftAnchorY} ${topDipX},${topDipY}
@@ -337,7 +329,6 @@
 
             pathElement.setAttribute('d', d);
 
-            // 6. Start Animation (Only on first load)
             if (!window.animationStarted) {
                 window.animationStarted = true;
                 runAnimation(pathElement, dot, statusText, btn);
@@ -349,7 +340,6 @@
             pathElement.style.strokeDasharray = len;
             pathElement.style.strokeDashoffset = len;
 
-            // Initial Position
             const p0 = pathElement.getPointAtLength(0);
             dot.style.left = p0.x + 'px';
             dot.style.top = p0.y + 'px';
@@ -361,8 +351,6 @@
 
             const timer = setInterval(() => {
                 progress += step;
-                
-                // Keep drawing correctly even if resized during animation
                 const currentLen = pathElement.getTotalLength();
                 pathElement.style.strokeDasharray = currentLen;
 
@@ -372,15 +360,11 @@
                     finalizeDelivery(btn, statusText);
                 }
 
-                // Draw
                 pathElement.style.strokeDashoffset = currentLen * (1 - progress);
-
-                // Move
                 const p = pathElement.getPointAtLength(currentLen * progress);
                 dot.style.left = p.x + 'px';
                 dot.style.top = p.y + 'px';
 
-                // Text
                 if (progress < 0.3) statusText.innerText = "Courier nearby...";
                 else if (progress < 0.6) statusText.innerText = "Taking the scenic route..."; 
                 else if (progress < 0.9) statusText.innerText = "Almost there...";    
