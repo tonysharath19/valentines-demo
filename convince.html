@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Evidence</title>
+    <title>The Appeal</title>
     <link href="https://fonts.googleapis.com/css2?family=Parisienne&family=Kaushan+Script&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     
     <style>
@@ -259,7 +259,7 @@
         <h2 class="section-title">Video Message</h2>
         
         <div class="video-frame">
-            <video id="videoPlayer" controls muted poster="https://placehold.co/800x450/pink/white?text=Our+Story" onclick="this.play()">
+            <video id="videoPlayer" autoplay muted loop>
                 <source src="vid.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
@@ -306,7 +306,7 @@
             sessionStorage.setItem('fromConvincePage', 'true');
 
             // Go to Celebration (Scene 6)
-            window.location.href = "scene6.html";
+            window.location.href = "celebration.html";
         }
     </script>
 
