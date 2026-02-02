@@ -184,6 +184,57 @@
             box-shadow: 0 8px 25px -5px rgba(194, 24, 91, 0.5);
         }
 
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+            .header-title {
+                font-size: 15px;
+            }
+            .map-wrapper {
+                padding: 10px;
+            }
+            .status-badge {
+                top: 15px;
+                left: 15px;
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+            .status-dot-icon {
+                width: 7px;
+                height: 7px;
+            }
+            .footer {
+                padding: 16px;
+                padding-bottom: max(16px, env(safe-area-inset-bottom));
+            }
+            .btn-main {
+                padding: 16px;
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-title {
+                font-size: 14px;
+            }
+            .status-badge {
+                top: 10px;
+                left: 10px;
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            .footer {
+                padding: 12px;
+                padding-bottom: max(12px, env(safe-area-inset-bottom));
+            }
+            .btn-main {
+                padding: 14px;
+                font-size: 14px;
+            }
+        }
+
     </style>
 </head>
 <body onload="initPerfectHeart()">

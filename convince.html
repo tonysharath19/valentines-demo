@@ -172,10 +172,11 @@
         /* --- FOOTER (CONVINCE BUTTON) --- */
         .footer-section {
             background: #FFF;
-            padding: 60px 20px;
+            padding: 40px 20px; /* Reduced padding for mobile */
             display: flex;
             justify-content: center;
             align-items: center;
+            min-height: auto; /* Ensure it doesn't overflow */
         }
 
         .btn-convinced {
@@ -209,6 +210,52 @@
         }
         
         @keyframes shine { to { left: 100%; } }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            .notification-bar {
+                padding: 10px 15px;
+            }
+            .notification-text {
+                font-size: 10px;
+            }
+            .full-section {
+                padding: 100px 15px; /* More space for mobile */
+                min-height: calc(100vh - 100px);
+            }
+            .section-title {
+                font-size: 2.5rem;
+                margin-bottom: 20px;
+            }
+            .audio-player-ui, .letter-container, .video-frame {
+                padding: 20px;
+                max-width: 100%;
+            }
+            .handwritten-content {
+                font-size: 18px;
+                line-height: 1.8;
+            }
+            .btn-convinced {
+                padding: 15px 30px;
+                font-size: 18px;
+            }
+            .footer-section {
+                padding: 30px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .section-title {
+                font-size: 2rem;
+            }
+            .btn-convinced {
+                padding: 12px 25px;
+                font-size: 16px;
+            }
+            .footer-section {
+                padding: 20px 10px;
+            }
+        }
 
     </style>
 </head>

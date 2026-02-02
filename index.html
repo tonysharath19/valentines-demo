@@ -113,6 +113,104 @@
             transition: all 0.2s ease;
         }
 
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+            .header-title {
+                font-size: 22px;
+            }
+            .main-content {
+                padding: 20px;
+                gap: 20px;
+            }
+            .tracking-card {
+                padding: 24px 20px;
+            }
+            .icon-wrapper {
+                width: 56px; height: 56px;
+            }
+            .box-icon {
+                font-size: 28px;
+            }
+            .tracking-number {
+                font-size: 24px;
+            }
+            .info-row {
+                padding: 16px;
+            }
+            .info-value {
+                font-size: 13px;
+            }
+            .cta-container {
+                padding: 20px;
+                padding-bottom: max(30px, env(safe-area-inset-bottom));
+            }
+            .btn-main {
+                padding: 16px;
+                font-size: 15px;
+            }
+            .otp-card {
+                width: 90%;
+                padding: 20px;
+            }
+            .otp-input {
+                padding: 12px;
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-title {
+                font-size: 20px;
+            }
+            .tracking-card {
+                padding: 20px 16px;
+            }
+            .tracking-number {
+                font-size: 22px;
+            }
+            .status-badge {
+                font-size: 13px;
+                padding: 5px 14px;
+            }
+            .info-row {
+                padding: 14px;
+            }
+            .info-label {
+                font-size: 10px;
+            }
+            .info-value {
+                font-size: 12px;
+            }
+            .cta-container {
+                padding: 16px;
+                padding-bottom: max(24px, env(safe-area-inset-bottom));
+            }
+            .btn-main {
+                padding: 14px;
+                font-size: 14px;
+            }
+            .otp-card {
+                padding: 16px;
+            }
+            .otp-title {
+                font-size: 16px;
+            }
+            .otp-subtitle {
+                font-size: 12px;
+            }
+            .otp-input {
+                padding: 10px;
+                font-size: 18px;
+            }
+            .btn-verify {
+                padding: 12px;
+                font-size: 14px;
+            }
+        }
+
         /* --- OTP MODAL --- */
         .otp-overlay {
             position: fixed;
